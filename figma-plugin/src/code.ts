@@ -13,6 +13,8 @@ figma.showUI(__html__, {
 const converter = new FigmaConverter();
 
 figma.ui.onmessage = async (msg: PluginMessage) => {
+  console.log('Plugin received message:', msg.type);
+
   try {
     switch (msg.type) {
       case 'html-parsed':
@@ -22,12 +24,17 @@ figma.ui.onmessage = async (msg: PluginMessage) => {
       case 'cancel':
         figma.closePlugin();
         break;
+
+      default:
+        console.log('Unhandled message type:', msg.type, msg.data);
     }
   } catch (error: any) {
+    console.error('Plugin error:', error);
     figma.ui.postMessage({
       type: 'error',
       data: { message: error.message }
     });
+    figma.notify(`Error: ${error.message}`, { error: true });
   }
 };
 
@@ -35,6 +42,8 @@ async function handleHtmlParsed(data: { parsed: any; name: string }) {
   const { parsed, name } = data;
 
   try {
+    console.log('Converting pattern:', name);
+
     // Convert to Figma nodes
     const frame = await converter.convert(parsed);
     frame.name = name;
@@ -50,6 +59,7 @@ async function handleHtmlParsed(data: { parsed: any; name: string }) {
 
     figma.notify(`Successfully imported: ${frame.name}`);
   } catch (error: any) {
+    console.error('Conversion error:', error);
     figma.ui.postMessage({
       type: 'error',
       data: { message: error.message }
