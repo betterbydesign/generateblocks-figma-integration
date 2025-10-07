@@ -1,0 +1,18 @@
+{
+  "name": "GenerateBlocks Pattern Importer",
+  "id": "generateblocks-importer",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "ui": "ui.html",
+  "editorType": ["figma", "figjam"],
+  "networkAccess": {
+    "allowedDomains": [
+      "https://patterns.generatepress.com",
+      "https://*.wp.com",
+      "https://*.wordpress.com"
+    ],
+    "reasoning": "This plugin fetches pattern data from WordPress sites"
+  },
+  "capabilities": [],
+  "permissions": []
+}

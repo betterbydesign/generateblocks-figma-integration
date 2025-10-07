@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { box-sizing: border-box; }
+    
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 12px;
+      background: var(--figma-color-bg);
+      color: var(--figma-color-text);
+    }
+    
+    .container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    h3 {
+      margin: 0 0 8px 0;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    .tabs {
+      display: flex;
+      gap: 4px;
+      border-bottom: 1px solid var(--figma-color-border);
+      margin-bottom: 16px;
+    }
+    
+    .tab {
+      padding: 8px 12px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+    
+    .tab:hover {
+      background: var(--figma-color-bg-hover);
+    }
+    
+    .tab.active {
+      border-bottom-color: var(--figma-color-text-brand);
+      color: var(--figma-color-text-brand);
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    label {
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--figma-color-text-secondary);
+    }
+    
+    input, textarea {
+      padding: 8px;
+      border: 1px solid var(--figma-color-border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 12px;
+      background: var(--figma-color-bg);
+      color: var(--figma-color-text);
+    }
+    
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--figma-color-text-brand);
+    }
+    
+    button {
+      padding: 8px 16px;
+      background: var(--figma-color-bg-brand);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12px;
+      transition: opacity 0.2s;
+    }
+    
+    button:hover {
+      opacity: 0.9;
+    }
+    
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    button.secondary {
+      background: var(--figma-color-bg-secondary);
+      color: var(--figma-color-text);
+    }
+    
+    .pattern-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 350px;
+      overflow-y: auto;
+    }
+    
+    .pattern-item {
+      padding: 12px;
+      border: 1px solid var(--figma-color-border);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .pattern-item:hover {
+      background: var(--figma-color-bg-hover);
+      border-color: var(--figma-color-text-brand);
+    }
+    
+    .pattern-name {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .pattern-meta {
+      color: var(--figma-color-text-secondary);
+      font-size: 10px;
+    }
+    
+    .status {
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 11px;
+      display: none;
+    }
+    
+    .status.show {
+      display: block;
+    }
+    
+    .status.success {
+      background: rgba(0, 200, 100, 0.1);
+      color: #00c864;
+      border: 1px solid rgba(0, 200, 100, 0.3);
+    }
+    
+    .status.error {
+      background: rgba(255, 0, 0, 0.1);
+      color: #ff4444;
+      border: 1px solid rgba(255, 0, 0, 0.3);
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: var(--figma-color-text-secondary);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--figma-color-text-secondary);
+    }
+    
+    .empty-state button {
+      margin-top: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h3>GenerateBlocks Importer</h3>
+    
+    <div class="tabs">
+      <div class="tab active" data-tab="browse">Browse</div>
+      <div class="tab" data-tab="import">Import HTML</div>
+      <div class="tab" data-tab="settings">Settings</div>
+    </div>
+    
+    <!-- Browse Tab -->
+    <div class="tab-content active" data-content="browse">
+      <button id="load-patterns">Load Patterns</button>
+      
+      <div id="pattern-list" class="pattern-list">
+        <div class="empty-state">
+          <div>No patterns loaded</div>
+          <button id="load-patterns-empty">Load Patterns from WordPress</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Import HTML Tab -->
+    <div class="tab-content" data-content="import">
+      <div class="section">
+        <label>Pattern Name</label>
+        <input type="text" id="pattern-name" placeholder="My Pattern" />
+      </div>
+      
+      <div class="section">
+        <label>HTML Preview</label>
+        <textarea 
+          id="html-input" 
+          rows="12" 
+          placeholder="Paste pattern HTML preview here..."
+        ></textarea>
+      </div>
+      
+      <button id="import-btn">Import to Figma</button>
+      
+      <div id="import-status" class="status"></div>
+    </div>
+    
+    <!-- Settings Tab -->
+    <div class="tab-content" data-content="settings">
+      <div class="section">
+        <label>WordPress Site URL</label>
+        <input 
+          type="text" 
+          id="site-url" 
+          placeholder="https://yoursite.com"
+        />
+      </div>
+      
+      <div class="section">
+        <label>Public Key (Optional)</label>
+        <input 
+          type="text" 
+          id="public-key" 
+          placeholder="Leave empty for local site"
+        />
+      </div>
+      
+      <button id="save-settings">Save Settings</button>
+      
+      <div id="settings-status" class="status"></div>
+      
+      <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--figma-color-border);">
+        <label>Default Pattern Library</label>
+        <p style="font-size: 11px; color: var(--figma-color-text-secondary); margin: 8px 0;">
+          URL: https://patterns.generatepress.com<br>
+          Public Key: NPhxc91jLH5yGB4Ni6KryXN6HKKggte0
+        </p>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Initialize
+    const DEFAULT_SITE = 'https://patterns.generatepress.com';
+    const DEFAULT_KEY = 'NPhxc91jLH5yGB4Ni6KryXN6HKKggte0';
+    
+    // Load saved settings
+    document.getElementById('site-url').value = 
+      localStorage.getItem('siteUrl') || DEFAULT_SITE;
+    document.getElementById('public-key').value = 
+      localStorage.getItem('publicKey') || DEFAULT_KEY;
+    
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabName = tab.dataset.tab;
+        
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelector(`[data-content="${tabName}"]`).classList.add('active');
+      });
+    });
+    
+    // Load patterns
+    function loadPatterns() {
+      const siteUrl = document.getElementById('site-url').value || DEFAULT_SITE;
+      const publicKey = document.getElementById('public-key').value || DEFAULT_KEY;
+      
+      document.getElementById('pattern-list').innerHTML = '<div class="loading">Loading patterns...</div>';
+      
+      // Fetch patterns from WordPress via UI (Figma plugins can't make network requests)
+      fetch(`${siteUrl}/wp-json/generateblocks-pro/v1/pattern-library/patterns`, {
+        headers: publicKey ? { 'X-GB-Public-Key': publicKey } : {}
+      })
+      .then(response => response.json())
+      .then(data => {
+        displayPatterns(data.response?.data || []);
+      })
+      .catch(error => {
+        document.getElementById('pattern-list').innerHTML = 
+          `<div class="empty-state" style="color: #ff4444;">Error: ${error.message}</div>`;
+      });
+    }
+    
+    document.getElementById('load-patterns').addEventListener('click', loadPatterns);
+    document.getElementById('load-patterns-empty').addEventListener('click', loadPatterns);
+    
+    // Display patterns
+    function displayPatterns(patterns) {
+      const list = document.getElementById('pattern-list');
+      
+      if (patterns.length === 0) {
+        list.innerHTML = '<div class="empty-state">No patterns found</div>';
+        return;
+      }
+      
+      list.innerHTML = '';
+      
+      patterns.forEach(pattern => {
+        const item = document.createElement('div');
+        item.className = 'pattern-item';
+        item.innerHTML = `
+          <div class="pattern-name">${pattern.label}</div>
+          <div class="pattern-meta">
+            ${pattern.globalStyleSelectors?.length || 0} styles · 
+            ${pattern.categories?.length || 0} categories
+          </div>
+        `;
+        
+        item.addEventListener('click', () => {
+          importPattern(pattern.preview, pattern.label);
+        });
+        
+        list.appendChild(item);
+      });
+    }
+    
+    // Import pattern
+    function importPattern(html, name) {
+      // Parse HTML in UI thread (has DOM access)
+      try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const element = doc.body.firstElementChild;
+        
+        if (!element) {
+          throw new Error('No content to import');
+        }
+        
+        const parsed = parseElement(element);
+        
+        // Send to plugin code
+        parent.postMessage({
+          pluginMessage: {
+            type: 'html-parsed',
+            data: { parsed, name }
+          }
+        }, '*');
+        
+      } catch (error) {
+        showStatus('import-status', `Error: ${error.message}`, 'error');
+      }
+    }
+    
+    // Parse element and compute styles
+    function parseElement(element) {
+      const styles = window.getComputedStyle(element);
+      
+      const directText = Array.from(element.childNodes)
+        .filter(node => node.nodeType === Node.TEXT_NODE)
+        .map(node => node.textContent.trim())
+        .filter(Boolean)
+        .join(' ');
+      
+      return {
+        tag: element.tagName.toLowerCase(),
+        classes: Array.from(element.classList),
+        id: element.id || undefined,
+        text: directText || undefined,
+        children: Array.from(element.children).map(child => parseElement(child)),
+        computedStyles: {
+          display: styles.display,
+          flexDirection: styles.flexDirection,
+          justifyContent: styles.justifyContent,
+          alignItems: styles.alignItems,
+          gap: styles.gap,
+          padding: styles.padding,
+          margin: styles.margin,
+          width: styles.width,
+          height: styles.height,
+          backgroundColor: styles.backgroundColor,
+          color: styles.color,
+          borderRadius: styles.borderRadius,
+          border: styles.border,
+          boxShadow: styles.boxShadow,
+          fontSize: styles.fontSize,
+          fontWeight: styles.fontWeight,
+          lineHeight: styles.lineHeight,
+          textAlign: styles.textAlign
+        }
+      };
+    }
+    
+    // Import from HTML textarea
+    document.getElementById('import-btn').addEventListener('click', () => {
+      const html = document.getElementById('html-input').value.trim();
+      const name = document.getElementById('pattern-name').value.trim() || 'Imported Pattern';
+      
+      if (!html) {
+        showStatus('import-status', 'Please paste HTML to import', 'error');
+        return;
+      }
+      
+      importPattern(html, name);
+    });
+    
+    // Save settings
+    document.getElementById('save-settings').addEventListener('click', () => {
+      const siteUrl = document.getElementById('site-url').value.trim();
+      const publicKey = document.getElementById('public-key').value.trim();
+      
+      localStorage.setItem('siteUrl', siteUrl);
+      localStorage.setItem('publicKey', publicKey);
+      
+      showStatus('settings-status', 'Settings saved successfully!', 'success');
+    });
+    
+    // Show status message
+    function showStatus(elementId, message, type) {
+      const status = document.getElementById(elementId);
+      status.textContent = message;
+      status.className = `status ${type} show`;
+      
+      setTimeout(() => {
+        status.classList.remove('show');
+      }, 3000);
+    }
+    
+    // Handle messages from plugin
+    window.onmessage = (event) => {
+      const msg = event.data.pluginMessage;
+      if (!msg) return;
+      
+      if (msg.type === 'import-success') {
+        showStatus('import-status', `Successfully imported: ${msg.data.nodeName}`, 'success');
+      }
+      
+      if (msg.type === 'error') {
+        showStatus('import-status', msg.data.message, 'error');
+      }
+    };
+  </script>
+</body>
+</html>
