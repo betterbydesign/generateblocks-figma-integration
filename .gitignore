@@ -1,0 +1,24 @@
+# Node modules
+node_modules/
+figma-plugin/node_modules/
+
+# Build output
+figma-plugin/dist/
+*.log
+
+# TypeScript
+*.tsbuildinfo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
