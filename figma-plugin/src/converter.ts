@@ -154,7 +154,7 @@ export class FigmaConverter {
 
     node.effects = [{
       type: 'DROP_SHADOW',
-      color: { ...color, a: 0.25 },
+      color: { r: color.r, g: color.g, b: color.b, a: 0.25 },
       offset: { x: parseFloat(x), y: parseFloat(y) },
       radius: parseFloat(blur),
       visible: true,
